@@ -1,4 +1,4 @@
-package me.jumen.kakaobank.Account;
+package me.jumen.kakaobank.account;
 
 public enum AccountType {
     DEPOSIT, MEETING

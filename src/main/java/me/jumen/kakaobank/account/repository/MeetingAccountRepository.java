@@ -1,5 +1,6 @@
-package me.jumen.kakaobank.Account;
+package me.jumen.kakaobank.account.repository;
 
+import me.jumen.kakaobank.account.MeetingAccount;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.util.Optional;
