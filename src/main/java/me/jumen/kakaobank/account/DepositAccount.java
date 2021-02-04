@@ -6,11 +6,8 @@ import me.jumen.kakaobank.account.transaction.TransactionType;
 import me.jumen.kakaobank.owner.Owner;
 
 import javax.persistence.*;
-import java.time.LocalDateTime;
-import java.time.ZoneId;
 import java.util.Date;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Set;
 
 /**

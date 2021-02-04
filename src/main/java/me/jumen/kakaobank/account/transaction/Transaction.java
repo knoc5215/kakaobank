@@ -1,7 +1,6 @@
 package me.jumen.kakaobank.account.transaction;
 
 import lombok.*;
-import me.jumen.kakaobank.account.Account;
 import me.jumen.kakaobank.account.DepositAccount;
 import me.jumen.kakaobank.account.MeetingAccount;
 import me.jumen.kakaobank.owner.Owner;
