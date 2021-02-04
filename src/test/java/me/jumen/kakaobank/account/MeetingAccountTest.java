@@ -69,7 +69,7 @@ class MeetingAccountTest {
     }
 
     @Test
-    @DisplayName("모임통장에 모임멤버 추가, 제거하기")
+    @DisplayName("d. 모임멤버 : 카카오뱅크 회원 가입 고객 (만 14세 이상) 모임멤버 추가, 제거하기")
     public void addAndRemoveParticipantsTest() {
         Owner owner = OwnerUtil.getOwner("원주영", 29, "01038855215");
         Owner save = ownerRepository.save(owner);
@@ -106,7 +106,7 @@ class MeetingAccountTest {
     }
 
     @Test
-    @DisplayName("모임주가 아닌 경우에는 출금 불가 테스트")
+    @DisplayName("c. 모임주(카카오뱅크 입출금통장 보유 고객) 아닌 경우에는 출금 불가 테스트")
     public void blockingWithdrawIfNotOwner() {
         Owner owner = OwnerUtil.getOwner("원주영", 29, "01038855215");
         Owner save = ownerRepository.save(owner);
@@ -144,7 +144,7 @@ class MeetingAccountTest {
     }
 
     @Test
-    @DisplayName("모임주 개설한도 100개 테스트")
+    @DisplayName("b. 모임통장서비스 1개당 모임멤버는 최대 100명까지 참여 가능")
     public void addMeetingAccountsOver100() {
         Owner owner = OwnerUtil.getOwner("원주영", 29, "01038855215");
         Owner save = ownerRepository.save(owner);
@@ -223,7 +223,7 @@ class MeetingAccountTest {
     }
 
     @Test
-    @DisplayName("입출금통장 1개당 모임통장서비스 1개만 신청 가능")
+    @DisplayName("a. 입출금통장 1개당 모임통장서비스 1개만 신청 가능")
     public void convertToDepositAccountDuplicate() {
         Owner owner = OwnerUtil.getOwner("원주영", 29, "01038855215");
         Owner save = ownerRepository.save(owner);
