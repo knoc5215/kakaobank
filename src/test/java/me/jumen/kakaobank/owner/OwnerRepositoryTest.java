@@ -1,6 +1,6 @@
 package me.jumen.kakaobank.owner;
 
-import me.jumen.kakaobank.account.OwnerUtil;
+import me.jumen.kakaobank.util.OwnerUtil;
 import me.jumen.kakaobank.account.repository.DepositAccountRepository;
 import me.jumen.kakaobank.account.repository.MeetingAccountRepository;
 import me.jumen.kakaobank.owner.repository.OwnerRepository;

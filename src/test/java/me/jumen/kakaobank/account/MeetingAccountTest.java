@@ -6,13 +6,14 @@ import me.jumen.kakaobank.account.transaction.Transaction;
 import me.jumen.kakaobank.owner.Owner;
 import me.jumen.kakaobank.owner.Participant;
 import me.jumen.kakaobank.owner.repository.OwnerRepository;
+import me.jumen.kakaobank.util.AccountUtil;
+import me.jumen.kakaobank.util.OwnerUtil;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 
 import java.util.Iterator;
-import java.util.List;
 import java.util.Random;
 import java.util.Set;
 

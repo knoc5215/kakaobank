@@ -9,9 +9,12 @@ import me.jumen.kakaobank.account.observe.Observer;
 import me.jumen.kakaobank.account.transaction.Transaction;
 import me.jumen.kakaobank.account.transaction.TransactionType;
 import me.jumen.kakaobank.owner.Owner;
+import org.aspectj.lang.annotation.Before;
 
 import javax.persistence.Inheritance;
 import javax.persistence.InheritanceType;
+import java.time.LocalDateTime;
+import java.time.ZoneId;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -44,7 +47,7 @@ public abstract class Account implements Observable {
         this.transactions = new ArrayList<>();
         this.observers = new ArrayList<>();
 
-        this.created = new Date();
+        this.created = Date.from(LocalDateTime.now().atZone(ZoneId.systemDefault()).toInstant());
         this.lastLogin = null;
         this.lastDepositWithdrawalTime = null;
 
@@ -56,12 +59,14 @@ public abstract class Account implements Observable {
             Long before = this.balance;
             this.balance += deposit;
             Long after = this.balance;
-
+            updateLastDepositWithdrawalTime();
             recordTransAction(TransactionType.DEPOSIT, accountNumber, owner.getId(), before, deposit, after);
 
 
         }
     }
+
+
 
     public void withDraw(Owner owner, Long accountNumber, Long withDraw) {
         if (this.balance - withDraw < 0) {
@@ -71,7 +76,7 @@ public abstract class Account implements Observable {
                 Long before = this.balance;
                 this.balance -= withDraw;
                 Long after = this.balance;
-
+                updateLastDepositWithdrawalTime();
                 recordTransAction(TransactionType.WITHDRAW, accountNumber, owner.getId(), before, withDraw, after);
             }
         }
@@ -85,7 +90,7 @@ public abstract class Account implements Observable {
                 .balanceBeforeTransaction(before)
                 .amount(amount)
                 .balanceAfterTransaction(after)
-                .transActionDate(new Date())
+                .transActionDate(this.lastDepositWithdrawalTime)
                 .build();
 
         this.transactions.add(transaction);
@@ -108,5 +113,9 @@ public abstract class Account implements Observable {
         for (Observer observer : observers) {
             observer.update(transaction);
         }
+    }
+
+    public void updateLastDepositWithdrawalTime() {
+        this.lastDepositWithdrawalTime = Date.from(LocalDateTime.now().atZone(ZoneId.systemDefault()).toInstant());
     }
 }

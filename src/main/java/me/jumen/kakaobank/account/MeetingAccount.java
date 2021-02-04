@@ -5,10 +5,9 @@ import me.jumen.kakaobank.owner.Owner;
 import me.jumen.kakaobank.owner.Participant;
 
 import javax.persistence.*;
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.time.LocalDateTime;
+import java.time.ZoneId;
+import java.util.*;
 
 /**
  * 모임통장
@@ -19,7 +18,6 @@ import java.util.Set;
 @NoArgsConstructor
 @ToString(callSuper = true, exclude = {"owner", "participants"})
 public class MeetingAccount extends Account {
-
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long accountNumber; //통장번호
@@ -28,7 +26,7 @@ public class MeetingAccount extends Account {
 
     @ManyToOne
     @JoinColumn(name = "owner_no")
-    private Owner owner;    //모임주
+    private Owner owner;    //모임주(명의자)
 
     @OneToMany(mappedBy = "meetingAccount")
     private Set<Participant> participants; //모임멤버
@@ -40,6 +38,7 @@ public class MeetingAccount extends Account {
         this.depositAccountId = depositAccount.getAccountNumber();
         depositAccount.setStatus(AccountStatus.SUSPEND);
         depositAccount.setConverted(true);
+        depositAccount.setConvertedDate(Date.from(LocalDateTime.now().atZone(ZoneId.systemDefault()).toInstant()));
 
         this.owner = owner;
         owner.addMeetingAccount(this);
@@ -60,10 +59,10 @@ public class MeetingAccount extends Account {
 
         if (!this.participants.contains(owner)) {
             Participant participant = Participant.builder().owner(owner).build();
-            boolean add = this.participants.add(participant);
+            boolean add = this.participants.add(participant);   //모임계좌에 멤버 추가
             if (add) {
                 super.subscribe(owner);
-                owner.getNumOfMeetingsHeld().add(participant);
+                owner.joinToMeeting(participant);
                 System.out.println(participant.getParticipant().getName() + " 모임멤버가 추가되었습니다.");
             }
         } else {
@@ -78,10 +77,10 @@ public class MeetingAccount extends Account {
         }
 
         if (this.participants.contains(participant)) {
-            boolean remove = this.participants.remove(participant);
+            boolean remove = this.participants.remove(participant); //모임멤버에서 멤거 제거
             if (remove) {
                 super.unSubscribe(participant.getParticipant());
-                owner.getNumOfMeetingsHeld().remove(participant);
+                participant.getParticipant().exitFromMeeting(participant);
                 System.out.println(participant.getParticipant().getName() + " 모임멤버가 삭제되었습니다.");
             }
         } else {

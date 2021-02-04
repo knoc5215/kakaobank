@@ -1,4 +1,4 @@
-package me.jumen.kakaobank.account;
+package me.jumen.kakaobank.util;
 
 import me.jumen.kakaobank.owner.Owner;
 

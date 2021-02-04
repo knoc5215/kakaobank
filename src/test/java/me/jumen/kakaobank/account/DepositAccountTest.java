@@ -4,6 +4,8 @@ import me.jumen.kakaobank.account.repository.DepositAccountRepository;
 import me.jumen.kakaobank.account.repository.MeetingAccountRepository;
 import me.jumen.kakaobank.owner.Owner;
 import me.jumen.kakaobank.owner.repository.OwnerRepository;
+import me.jumen.kakaobank.util.AccountUtil;
+import me.jumen.kakaobank.util.OwnerUtil;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;

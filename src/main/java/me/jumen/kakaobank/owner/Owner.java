@@ -31,16 +31,16 @@ public class Owner implements Observer {
     private String phoneNumber;
 
     @OneToMany(mappedBy = "owner", fetch = FetchType.EAGER)
-    private Set<DepositAccount> depositAccounts;
+    private Set<DepositAccount> depositAccounts;    //보유 입출금계좌
 
     @OneToMany(mappedBy = "owner", fetch = FetchType.LAZY)
-    private Set<MeetingAccount> meetingAccounts;
+    private Set<MeetingAccount> meetingAccounts;    //보유 모임계좌(모임주)
 
     @OneToMany(mappedBy = "participant", fetch = FetchType.LAZY)
-    private Set<Participant> numOfMeetingsHeld;
+    private Set<Participant> numOfMeetingsHeld; //참여 모임계좌(모임멤버)
 
-    private Date created;
-    private Date lastLogin;
+    private Date created;   //생성시각
+    private Date lastLogin; //최종로그인
 
     @Builder
     public Owner(String name, Integer age, String phoneNumber) {
@@ -104,7 +104,6 @@ public class Owner implements Observer {
 
     @Override
     public void update(Transaction transaction) {
-        //        System.out.println("[알림대상] " + this.name + ", " + this.age);
         System.out.println("[ALERT] " + this.toString());
         if (transaction.getTransactionType() == TransactionType.DEPOSIT) {
             System.out.println(this.name + "님이 " + "계좌번호 " + transaction.getAccountNumber() + " 로 " + transaction.getAmount() + "원을 입금하셨습니다. 현재 잔액은 " + transaction.getBalanceAfterTransaction() + "원 입니다.");

@@ -4,6 +4,7 @@ import lombok.*;
 import me.jumen.kakaobank.owner.Owner;
 
 import javax.persistence.*;
+import java.util.Date;
 
 /**
  * 입출금계좌
@@ -25,7 +26,7 @@ public class DepositAccount extends Account {
 
     private Long meetingAccountId;  //전환된 모임통장ID
     private boolean isConverted;    //전환여부
-
+    private Date convertedDate;  //전환시각
 
     @Builder
     public DepositAccount(Owner owner, String title) {
@@ -34,6 +35,7 @@ public class DepositAccount extends Account {
         this.owner = owner;
         this.meetingAccountId = null;
         this.isConverted = false;
+        this.convertedDate = null;
         owner.addDepositAccount(this);
     }
 

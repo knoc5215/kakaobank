@@ -1,5 +1,7 @@
-package me.jumen.kakaobank.account;
+package me.jumen.kakaobank.util;
 
+import me.jumen.kakaobank.account.DepositAccount;
+import me.jumen.kakaobank.account.MeetingAccount;
 import me.jumen.kakaobank.owner.Owner;
 
 public class AccountUtil {
