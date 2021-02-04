@@ -1,10 +1,17 @@
 package me.jumen.kakaobank.account;
 
 import lombok.*;
+import me.jumen.kakaobank.account.transaction.Transaction;
+import me.jumen.kakaobank.account.transaction.TransactionType;
 import me.jumen.kakaobank.owner.Owner;
 
 import javax.persistence.*;
+import java.time.LocalDateTime;
+import java.time.ZoneId;
 import java.util.Date;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
 
 /**
  * 입출금계좌
@@ -19,6 +26,9 @@ public class DepositAccount extends Account {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long accountNumber; //통장번호
+
+    @OneToMany(mappedBy = "depositAccount")
+    private Set<Transaction> transactions;
 
     @ManyToOne
     @JoinColumn(name = "owner_no")
@@ -36,6 +46,7 @@ public class DepositAccount extends Account {
         this.meetingAccountId = null;
         this.isConverted = false;
         this.convertedDate = null;
+        this.transactions = new HashSet<>();
         owner.addDepositAccount(this);
     }
 
@@ -49,7 +60,32 @@ public class DepositAccount extends Account {
         }
     }
 
-    //TODO 모임멤버 입금
+    @Override
+    public void deposit(Owner owner, Long accountNumber, Long deposit) {
+        super.deposit(owner, accountNumber, deposit);
+    }
+
+    @Override
+    public void recordTransAction(TransactionType transactionType, Long accountNumber, Long owner_id, Long before, Long amount, Long after) {
+        Transaction transaction = Transaction.builder()
+                .accountNumber(accountNumber)
+                .owner_id(owner_id)
+                .transactionType(transactionType)
+                .balanceBeforeTransaction(before)
+                .amount(amount)
+                .balanceAfterTransaction(after)
+                .transActionDate(super.getLastDepositWithdrawalTime())
+                .build();
+
+        this.transactions.add(transaction);
+        super.notifyOwner(transaction);
+    }
+
+
+
+
+
+
 
 
 }

@@ -1,6 +1,8 @@
 package me.jumen.kakaobank.account;
 
 import lombok.*;
+import me.jumen.kakaobank.account.transaction.Transaction;
+import me.jumen.kakaobank.account.transaction.TransactionType;
 import me.jumen.kakaobank.owner.Owner;
 import me.jumen.kakaobank.owner.Participant;
 
@@ -9,6 +11,7 @@ import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.util.Date;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 /**
@@ -23,6 +26,9 @@ public class MeetingAccount extends Account {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long accountNumber; //통장번호
+
+    @OneToMany(mappedBy = "meetingAccount")
+    private Set<Transaction> transactions;
 
     private Long depositAccountId;  //전환된 입출금계좌ID
 
@@ -45,6 +51,7 @@ public class MeetingAccount extends Account {
         this.owner = owner;
         owner.addMeetingAccount(this);
         this.participants = new HashSet<>();
+        this.transactions = new HashSet<>();
 
     }
 
@@ -98,5 +105,21 @@ public class MeetingAccount extends Account {
         } else {
             System.out.println("모임주가 아니면 출금할 수 없습니다.");
         }
+    }
+
+    @Override
+    public void recordTransAction(TransactionType transactionType, Long accountNumber, Long owner_id, Long before, Long amount, Long after) {
+        Transaction transaction = Transaction.builder()
+                .accountNumber(accountNumber)
+                .owner_id(owner_id)
+                .transactionType(transactionType)
+                .balanceBeforeTransaction(before)
+                .amount(amount)
+                .balanceAfterTransaction(after)
+                .transActionDate(super.getLastDepositWithdrawalTime())
+                .build();
+
+        this.transactions.add(transaction);
+        super.notifyOwner(transaction);
     }
 }

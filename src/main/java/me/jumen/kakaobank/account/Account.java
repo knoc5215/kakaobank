@@ -12,6 +12,8 @@ import me.jumen.kakaobank.owner.Owner;
 
 import javax.persistence.Inheritance;
 import javax.persistence.InheritanceType;
+import javax.persistence.MappedSuperclass;
+import javax.persistence.OneToMany;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.util.ArrayList;
@@ -24,14 +26,15 @@ import java.util.List;
 @Getter
 @Setter
 @NoArgsConstructor
-@Inheritance(strategy = InheritanceType.TABLE_PER_CLASS)
+@Inheritance(strategy = InheritanceType.SINGLE_TABLE)
 @ToString(exclude = {"transactions", "observers"})
+@MappedSuperclass
 public abstract class Account implements Observable {
 
     private String title;   //계좌명
     private AccountType type;   //계좌종류
     private AccountStatus status; //계좌상태
-    private List<Transaction> transactions; //거래내역
+//    private List<Transaction> transactions; //거래내역
     private List<Observer> observers;   //알림대상
     private Date created;   //생성시간
     private Date lastLogin; //마지막 로그인 시간
@@ -43,7 +46,7 @@ public abstract class Account implements Observable {
         this.title = title;
         this.status = AccountStatus.ACTIVE;
 
-        this.transactions = new ArrayList<>();
+//        this.transactions = new ArrayList<>();
         this.observers = new ArrayList<>();
 
         this.created = Date.from(LocalDateTime.now().atZone(ZoneId.systemDefault()).toInstant());
@@ -81,7 +84,7 @@ public abstract class Account implements Observable {
         }
     }
 
-    private void recordTransAction(TransactionType transactionType, Long accountNumber, Long owner_id, Long before, Long amount, Long after) {
+    public void recordTransAction(TransactionType transactionType, Long accountNumber, Long owner_id, Long before, Long amount, Long after) {
         Transaction transaction = Transaction.builder()
                 .accountNumber(accountNumber)
                 .owner_id(owner_id)
@@ -92,7 +95,7 @@ public abstract class Account implements Observable {
                 .transActionDate(this.lastDepositWithdrawalTime)
                 .build();
 
-        this.transactions.add(transaction);
+//        this.transactions.add(transaction);
         notifyOwner(transaction);
     }
 

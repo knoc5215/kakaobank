@@ -1,12 +1,12 @@
 package me.jumen.kakaobank.account.transaction;
 
 import lombok.*;
+import me.jumen.kakaobank.account.Account;
+import me.jumen.kakaobank.account.DepositAccount;
+import me.jumen.kakaobank.account.MeetingAccount;
 import me.jumen.kakaobank.owner.Owner;
 
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
+import javax.persistence.*;
 import java.util.Date;
 
 @Entity
@@ -18,6 +18,16 @@ public class Transaction {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;    //일련번호
+
+    @ManyToOne
+    @JoinColumn(name = "depositTrasaction_no")
+    private DepositAccount depositAccount;
+
+    @ManyToOne
+    @JoinColumn(name = "meetingTrasaction_no")
+    private MeetingAccount meetingAccount;
+
+
 
     private Long accountNumber; //계좌번호
 
