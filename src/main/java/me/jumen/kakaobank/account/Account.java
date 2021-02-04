@@ -9,7 +9,6 @@ import me.jumen.kakaobank.account.observe.Observer;
 import me.jumen.kakaobank.account.transaction.Transaction;
 import me.jumen.kakaobank.account.transaction.TransactionType;
 import me.jumen.kakaobank.owner.Owner;
-import org.aspectj.lang.annotation.Before;
 
 import javax.persistence.Inheritance;
 import javax.persistence.InheritanceType;
