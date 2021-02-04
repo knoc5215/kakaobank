@@ -28,7 +28,6 @@ import java.util.List;
 @NoArgsConstructor
 @Inheritance(strategy = InheritanceType.SINGLE_TABLE)
 @ToString(exclude = {"transactions", "observers"})
-@MappedSuperclass
 public abstract class Account implements Observable {
 
     private String title;   //계좌명
