@@ -2,6 +2,7 @@ package me.jumen.kakaobank.account;
 
 import me.jumen.kakaobank.account.repository.DepositAccountRepository;
 import me.jumen.kakaobank.account.repository.MeetingAccountRepository;
+import me.jumen.kakaobank.account.transaction.Transaction;
 import me.jumen.kakaobank.owner.Owner;
 import me.jumen.kakaobank.owner.Participant;
 import me.jumen.kakaobank.owner.repository.OwnerRepository;
@@ -35,12 +36,16 @@ class MeetingAccountTest {
         Owner owner = OwnerUtil.getOwner("원주영", 29, "01038855215");
         Owner save = ownerRepository.save(owner);
 
+        System.out.println(save.toString());
+
         for (int i = 0; i < 10; i++) {
             DepositAccount depositAccount = AccountUtil.getDepositAccount(save, "입출금계좌 " + (i + 1));
             DepositAccount saveDepositAccount = depositAccountRepository.save(depositAccount);
+            System.out.println(saveDepositAccount.toString());
 
             MeetingAccount meetingAccount = AccountUtil.getMeetingAccountFromDepositAccount(saveDepositAccount, owner, "모임통장 " + (i + 1));
             MeetingAccount saveMeetingAccount = meetingAccountRepository.save(meetingAccount);
+            System.out.println(saveMeetingAccount.toString());
         }
 
         System.out.println("입출금계좌는 SUSPEND 상태로");
@@ -90,9 +95,51 @@ class MeetingAccountTest {
 
 
         System.out.println("모임통장 멤버 1명 삭제");
-        List<Participant> participants = saveMeetingAccount.getParticipants();
-        saveMeetingAccount.removeParticipant(participants.get(0));
+        Set<Participant> participants = saveMeetingAccount.getParticipants();
+        Iterator<Participant> participantIterator = participants.iterator();
+        Participant next = participantIterator.next();
+        System.out.println(next.toString());
+        saveMeetingAccount.removeParticipant(next);
         assertThat(saveMeetingAccount.getParticipants().size()).isEqualTo(9);
+
+    }
+
+    @Test
+    @DisplayName("모임주가 아닌 경우에는 출금 불가 테스트")
+    public void blockingWithdrawIfNotOwner() {
+        Owner owner = OwnerUtil.getOwner("원주영", 29, "01038855215");
+        Owner save = ownerRepository.save(owner);
+        System.out.println(save.toString());
+
+        DepositAccount depositAccount = AccountUtil.getDepositAccount(save, "입출금계좌");
+        DepositAccount saveDepositAccount = depositAccountRepository.save(depositAccount);
+        System.out.println(saveDepositAccount.toString());
+
+        MeetingAccount meetingAccount = AccountUtil.getMeetingAccountFromDepositAccount(saveDepositAccount, owner, "모임통장");
+        MeetingAccount saveMeetingAccount = meetingAccountRepository.save(meetingAccount);
+        System.out.println(saveMeetingAccount.toString());
+
+        assertThat(saveMeetingAccount.getParticipants().size()).isEqualTo(0);
+
+        System.out.println("모임통장 멤버 10명 추가");
+        Random random = new Random();
+        for (int i = 1; i <= 10; i++) {
+            Owner inviteOwner = OwnerUtil.getOwner("초대 " + (i), random.nextInt(50), "01012341234");
+            saveMeetingAccount.addParticipant(inviteOwner);
+        }
+        assertThat(saveMeetingAccount.getParticipants().size()).isEqualTo(10);
+
+        Owner anotherOwner = OwnerUtil.getOwner("다른사람", 39, "01011112222");
+
+
+        System.out.println("모임주가 모임통장에 1000원 입금");
+        saveMeetingAccount.deposit(save, saveMeetingAccount.getAccountNumber(), 1000L);
+        System.out.println(saveMeetingAccount.toString());
+
+        System.out.println("모임주가 아닌 사용자가 모임통장서 1000원 출금");
+        saveMeetingAccount.withDraw(anotherOwner, saveMeetingAccount.getAccountNumber(), 100L);
+        System.out.println("balance :" + saveMeetingAccount.getBalance());
+
     }
 
     @Test
@@ -100,14 +147,17 @@ class MeetingAccountTest {
     public void addMeetingAccountsOver100() {
         Owner owner = OwnerUtil.getOwner("원주영", 29, "01038855215");
         Owner save = ownerRepository.save(owner);
+        System.out.println(save.toString());
 
         for (int i = 1; i <= 110; i++) {
 
             DepositAccount depositAccount = AccountUtil.getDepositAccount(save, "입출금계좌 " + (i));
             DepositAccount saveDepositAccount = depositAccountRepository.save(depositAccount);
+            System.out.println(saveDepositAccount.toString());
 
             MeetingAccount meetingAccount = AccountUtil.getMeetingAccountFromDepositAccount(saveDepositAccount, owner, "모임통장 " + (i + 1));
             MeetingAccount saveMeetingAccount = meetingAccountRepository.save(meetingAccount);
+            System.out.println(saveMeetingAccount.toString());
 
         }
 
@@ -140,16 +190,19 @@ class MeetingAccountTest {
         Owner owner = OwnerUtil.getOwner("원주영", 29, "01038855215");
         Owner save = ownerRepository.save(owner);
 
-        int depositAccountsSize = 30;
+        Random random = new Random();
+        int depositAccountsSize = random.nextInt(50) + 30;  // 30개 ~ 80개
         int meetingAccountsSize = depositAccountsSize;
 
         for (int i = 1; i <= depositAccountsSize; i++) {
 
             DepositAccount depositAccount = AccountUtil.getDepositAccount(save, "입출금계좌 " + (i));
             DepositAccount saveDepositAccount = depositAccountRepository.save(depositAccount);
+            System.out.println(saveDepositAccount.toString());
 
             MeetingAccount meetingAccount = AccountUtil.getMeetingAccountFromDepositAccount(saveDepositAccount, owner, "모임통장 " + (i));
             MeetingAccount saveMeetingAccount = meetingAccountRepository.save(meetingAccount);
+            System.out.println(saveMeetingAccount.toString());
 
         }
         assertThat(save.getDepositAccounts().size()).isEqualTo(depositAccountsSize);
@@ -165,7 +218,7 @@ class MeetingAccountTest {
             next.addParticipant(save);
         }
 
-        assertThat(save.getNumOfMeetingsHeld().size()).isEqualTo(meetingAccountsSize);  //모임에 30개까지만 참여 가능
+        assertThat(save.getNumOfMeetingsHeld().size()).isLessThanOrEqualTo(30);  //모임에 30개까지만 참여 가능
     }
 
     @Test
@@ -173,18 +226,21 @@ class MeetingAccountTest {
     public void convertToDepositAccountDuplicate() {
         Owner owner = OwnerUtil.getOwner("원주영", 29, "01038855215");
         Owner save = ownerRepository.save(owner);
+        System.out.println(save.toString());
 
         DepositAccount depositAccount = AccountUtil.getDepositAccount(save, "입출금계좌");
         DepositAccount saveDepositAccount = depositAccountRepository.save(depositAccount);
+        System.out.println(saveDepositAccount.toString());
 
         int convertSuccessCnt = 0;
         for (int i = 0; i < 2; i++) {
             if (!depositAccount.isConverted()) {
                 MeetingAccount meetingAccount = AccountUtil.getMeetingAccountFromDepositAccount(saveDepositAccount, owner, "모임통장");
                 MeetingAccount saveMeetingAccount = meetingAccountRepository.save(meetingAccount);
+                System.out.println(saveMeetingAccount.toString());
                 convertSuccessCnt++;
             } else {
-                System.out.println(depositAccount.getType() + ", 계좌번호 : " + depositAccount.getAccountNumber() + " 계좌는 이미 모임통장으로 전환되었습니다.");
+                System.out.println(depositAccount.isConverted() + " > " + depositAccount.getType() + ", 계좌번호 : " + depositAccount.getAccountNumber() + " 계좌는 이미 모임통장으로 전환되었습니다.");
 
             }
         }
@@ -197,12 +253,15 @@ class MeetingAccountTest {
     public void selectTransactions() {
         Owner owner = OwnerUtil.getOwner("원주영", 29, "01038855215");
         Owner save = ownerRepository.save(owner);
+        System.out.println(save.toString());
 
         DepositAccount depositAccount = AccountUtil.getDepositAccount(save, "입출금계좌");
         DepositAccount saveDepositAccount = depositAccountRepository.save(depositAccount);
+        System.out.println(saveDepositAccount.toString());
 
         MeetingAccount meetingAccount = AccountUtil.getMeetingAccountFromDepositAccount(saveDepositAccount, owner, "모임통장");
         MeetingAccount saveMeetingAccount = meetingAccountRepository.save(meetingAccount);
+        System.out.println(saveMeetingAccount.toString());
 
         assertThat(saveMeetingAccount.getParticipants().size()).isEqualTo(0);
 
@@ -223,11 +282,15 @@ class MeetingAccountTest {
             System.out.println("모임통장 멤버들에게 입금알림 출력");
             for (int i = 0; i < 10; i++) {
                 saveMeetingAccount.deposit(save, saveMeetingAccount.getAccountNumber(), 1000L); //10번 입금
+                System.out.println(saveMeetingAccount.toString());
             }
 
         }
 
         assertThat(saveMeetingAccount.getTransactions().size()).isEqualTo(10);  //해당 모임통장의 거래내역이 10개 존재한다.
+        for (Transaction transaction : saveMeetingAccount.getTransactions()) {
+            transaction.printTransactionAlert(save);
+        }
 
     }
 

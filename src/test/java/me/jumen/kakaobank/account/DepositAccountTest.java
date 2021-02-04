@@ -60,6 +60,9 @@ class DepositAccountTest {
         account.withDraw(owner, account.getAccountNumber(), 100L);
         System.out.println("balance :" + account.getBalance());
 
+        account.withDraw(OwnerUtil.getOwner("도둑놈", 100, "01011112222"), account.getAccountNumber(), 100L);
+        System.out.println("balance :" + account.getBalance());
+
         assertThat(account.getTransactions().size()).isEqualTo(2);
 
     }

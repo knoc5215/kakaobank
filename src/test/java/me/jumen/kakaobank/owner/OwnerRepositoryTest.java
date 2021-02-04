@@ -1,7 +1,6 @@
 package me.jumen.kakaobank.owner;
 
-import me.jumen.kakaobank.account.DepositAccount;
-import me.jumen.kakaobank.account.MeetingAccount;
+import me.jumen.kakaobank.account.OwnerUtil;
 import me.jumen.kakaobank.account.repository.DepositAccountRepository;
 import me.jumen.kakaobank.account.repository.MeetingAccountRepository;
 import me.jumen.kakaobank.owner.repository.OwnerRepository;
@@ -29,52 +28,13 @@ class OwnerRepositoryTest {
     @Test
     @DisplayName("고객 만들기")
     public void makeClient() {
-        Owner owner = getClient("원주영", 29, "01038855215");
+        Owner owner = OwnerUtil.getOwner("원주영", 29, "01038855215");
         Owner save = ownerRepository.save(owner);
 
-        Optional<Owner> byName = ownerRepository.findByName(save.getName());
+        Optional<Owner> byName = ownerRepository.findById(save.getId());
 
-        assertThat(byName.get()).isNotNull();
+        assertThat(byName.isEmpty()).isFalse();
         assertThat(byName.get().getName()).isEqualTo("원주영");
-    }
-
-
-
-
-
-
-
-    public Owner getClient(String name, Integer age, String phoneNumber) {
-        return Owner.builder()
-                .name(name)
-                .age(age)
-                .phoneNumber(phoneNumber)
-                .build();
-    }
-
-    public DepositAccount getDepositAccount(Owner owner) {
-        return DepositAccount.builder()
-                .owner(owner)
-                .build();
-    }
-
-    public MeetingAccount getMeetingAccount(Owner owner) {
-        return MeetingAccount.builder()
-                .owner(owner)
-                .build();
-    }
-
-    public MeetingAccount getMeetingAccountWithTitle(Owner owner, String title) {
-        return MeetingAccount.builder()
-                .owner(owner)
-                .title("[모임계좌] " + title)
-                .build();
-    }
-
-    public Participant getParticipant(Owner owner) {
-        return Participant.builder()
-                .owner(owner)
-                .build();
     }
 
 
