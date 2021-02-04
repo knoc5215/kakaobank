@@ -6,27 +6,32 @@ import me.jumen.kakaobank.owner.Participant;
 
 import javax.persistence.*;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
+/**
+ * 모임통장
+ */
 @Entity
 @Getter
 @Setter
 @NoArgsConstructor
-@ToString(callSuper = true, includeFieldNames = true)
+@ToString(callSuper = true, exclude = {"owner", "participants"})
 public class MeetingAccount extends Account {
 
     @Id
-    @GeneratedValue
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long accountNumber; //통장번호
 
-    private Long depositAccountId;
+    private Long depositAccountId;  //전환된 입출금계좌ID
 
     @ManyToOne
     @JoinColumn(name = "owner_no")
-    private Owner owner;
+    private Owner owner;    //모임주
 
     @OneToMany(mappedBy = "meetingAccount")
-    private List<Participant> participants;
+    private Set<Participant> participants; //모임멤버
 
 
     @Builder
@@ -38,7 +43,7 @@ public class MeetingAccount extends Account {
 
         this.owner = owner;
         owner.addMeetingAccount(this);
-        this.participants = new ArrayList<>();
+        this.participants = new HashSet<>();
 
     }
 
@@ -84,4 +89,13 @@ public class MeetingAccount extends Account {
         }
     }
 
+    @Override
+    public void withDraw(Owner owner, Long accountNumber, Long withDraw) {
+        if (this.owner.equals(owner)) {
+            System.out.println("모임주가 출금한다.");
+            super.withDraw(owner, accountNumber, withDraw);
+        } else {
+            System.out.println("모임주가 아니면 출금할 수 없습니다.");
+        }
+    }
 }

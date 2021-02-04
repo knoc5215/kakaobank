@@ -3,6 +3,7 @@ package me.jumen.kakaobank.account;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import lombok.ToString;
 import me.jumen.kakaobank.account.observe.Observable;
 import me.jumen.kakaobank.account.observe.Observer;
 import me.jumen.kakaobank.account.transaction.Transaction;
@@ -15,23 +16,21 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
+/**
+ * 계좌 수퍼클래스
+ */
 @Getter
 @Setter
 @NoArgsConstructor
 @Inheritance(strategy = InheritanceType.TABLE_PER_CLASS)
+@ToString(exclude = {"transactions", "observers"})
 public abstract class Account implements Observable {
 
-    private String title;
-
+    private String title;   //계좌명
     private AccountType type;   //계좌종류
     private AccountStatus status; //계좌상태
-
-
-    private List<Transaction> transactions;
-
-    private List<Observer> observers;
-
-
+    private List<Transaction> transactions; //거래내역
+    private List<Observer> observers;   //알림대상
     private Date created;   //생성시간
     private Date lastLogin; //마지막 로그인 시간
     private Date lastDepositWithdrawalTime; //마지막 입출금 거래 시간
@@ -55,7 +54,7 @@ public abstract class Account implements Observable {
     public void deposit(Owner owner, Long accountNumber, Long deposit) {
         synchronized (this) {
             Long before = this.balance;
-            balance += deposit;
+            this.balance += deposit;
             Long after = this.balance;
 
             recordTransAction(TransactionType.DEPOSIT, accountNumber, owner.getId(), before, deposit, after);
@@ -65,12 +64,12 @@ public abstract class Account implements Observable {
     }
 
     public void withDraw(Owner owner, Long accountNumber, Long withDraw) {
-        if (balance - withDraw < 0) {
+        if (this.balance - withDraw < 0) {
             System.out.println("잔고가 부족합니다.");
         } else {
             synchronized (this) {
                 Long before = this.balance;
-                balance -= withDraw;
+                this.balance -= withDraw;
                 Long after = this.balance;
 
                 recordTransAction(TransactionType.WITHDRAW, accountNumber, owner.getId(), before, withDraw, after);

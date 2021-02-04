@@ -16,15 +16,15 @@ import java.util.Set;
 @Entity
 @Getter
 @Setter
-@ToString
 @NoArgsConstructor
+@ToString(exclude = {"depositAccounts", "meetingAccounts", "numOfMeetingsHeld"})
 public class Owner implements Observer {
     private final static int MEETINGACCOUNT_RETENTION_LIMIT = 100;      //모임계좌는 100개까지 개설 가능
     private final static int MEETINGACCOUNT_PARTICIPATION_LIMIT = 30;   //모임계좌에 30개까지 참여 가능
 
 
     @Id
-    @GeneratedValue
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
     private String name;
     private Integer age;
@@ -104,13 +104,15 @@ public class Owner implements Observer {
 
     @Override
     public void update(Transaction transaction) {
-        System.out.println("[알림대상] " + this.name + ", " + this.age);
-
+        //        System.out.println("[알림대상] " + this.name + ", " + this.age);
+        System.out.println("[ALERT] " + this.toString());
         if (transaction.getTransactionType() == TransactionType.DEPOSIT) {
             System.out.println(this.name + "님이 " + "계좌번호 " + transaction.getAccountNumber() + " 로 " + transaction.getAmount() + "원을 입금하셨습니다. 현재 잔액은 " + transaction.getBalanceAfterTransaction() + "원 입니다.");
         } else {
             System.out.println(this.name + "님이 " + "계좌번호 " + transaction.getAccountNumber() + " 에서 " + transaction.getAmount() + "원을 출금하셨습니다. 현재 잔액은 " + transaction.getBalanceAfterTransaction() + "원 입니다.");
         }
-        System.out.println(transaction.toString());
+        System.out.println(transaction.toString() + "\n");
     }
 }
+
+

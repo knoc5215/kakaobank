@@ -1,9 +1,11 @@
 package me.jumen.kakaobank.account.transaction;
 
 import lombok.*;
+import me.jumen.kakaobank.owner.Owner;
 
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import java.util.Date;
 
@@ -14,7 +16,7 @@ import java.util.Date;
 @ToString
 public class Transaction {
     @Id
-    @GeneratedValue
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;    //일련번호
 
     private Long accountNumber; //계좌번호
@@ -48,4 +50,19 @@ public class Transaction {
         this.balanceAfterTransaction = balanceAfterTransaction;
         this.transActionDate = transActionDate;
     }
+
+    public void printTransactionAlert(Owner owner) {
+        StringBuffer stringBuffer = new StringBuffer();
+        switch (this.transactionType) {
+            case DEPOSIT:
+                stringBuffer.append("[").append(owner.getName()).append("]").append("님이 ").append("계좌번호[").append(this.getAccountNumber()).append("]로 ").append(this.getAmount()).append("원을 입금하셨습니다.").append("\n");
+                break;
+            case WITHDRAW:
+                stringBuffer.append("[").append(owner.getName()).append("]").append("님이 ").append("계좌번호[").append(this.getAccountNumber()).append("]에서 ").append(this.getAmount()).append("원을 출금하셨습니다.").append("\n");
+                break;
+        }
+        stringBuffer.append("현재 잔액은 ").append(this.getBalanceAfterTransaction()).append("원 입니다.");
+        System.out.println(stringBuffer);
+    }
+
 }
